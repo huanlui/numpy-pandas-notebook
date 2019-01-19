@@ -1,0 +1,2946 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Data Aggregation and Group Operations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## GroupBy"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame({'producto':list('aabba'),\n",
+    "                    'vendedor':['Juan','Celia','Juan','Celia', 'Juan' ],\n",
+    "                      'balance': np.random.randn(5)*10,\n",
+    "                       'income': np.random.randn(5)+2,\n",
+    "                  })"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>balance</th>\n",
+       "      <th>income</th>\n",
+       "      <th>producto</th>\n",
+       "      <th>vendedor</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>-17.575465</td>\n",
+       "      <td>1.020607</td>\n",
+       "      <td>a</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>3.503198</td>\n",
+       "      <td>a</td>\n",
+       "      <td>Celia</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>-10.223210</td>\n",
+       "      <td>1.875094</td>\n",
+       "      <td>b</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>2.179792</td>\n",
+       "      <td>b</td>\n",
+       "      <td>Celia</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>-4.403535</td>\n",
+       "      <td>1.144516</td>\n",
+       "      <td>a</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     balance    income producto vendedor\n",
+       "0 -17.575465  1.020607        a     Juan\n",
+       "1  -2.123048  3.503198        a    Celia\n",
+       "2 -10.223210  1.875094        b     Juan\n",
+       "3  -0.808254  2.179792        b    Celia\n",
+       "4  -4.403535  1.144516        a     Juan"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_Ejercicio de repaso_: sacar media de balance e income"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "-7.026702320594273"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['balance'].mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1.944641263981696"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['income'].mean()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Para sacar la media por producto"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>balance</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>producto</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>a</th>\n",
+       "      <td>-8.034016</td>\n",
+       "      <td>1.889440</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b</th>\n",
+       "      <td>-5.515732</td>\n",
+       "      <td>2.027443</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "           balance    income\n",
+       "producto                    \n",
+       "a        -8.034016  1.889440\n",
+       "b        -5.515732  2.027443"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "means = df.groupby('producto').mean()\n",
+    "means"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "pandas.core.groupby.DataFrameGroupBy"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "type(df.groupby('producto'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<pandas.core.groupby.DataFrameGroupBy object at 0x7f334b044c18>"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.groupby('producto')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_NOTA: La salida de groupby es un Dataframe _especial_\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "producto\n",
+       "a   -8.034016\n",
+       "b   -5.515732\n",
+       "Name: balance, dtype: float64"
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "mean_producto = df.groupby('producto')['balance'].mean()\n",
+    "mean_producto"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "pandas.core.series.Series"
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "type(mean_producto)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Media del balance para el producto a"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "-8.03401575678113"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.groupby('producto')['balance'].mean()['a']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Se puede agrupar por varias columnas"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th>balance</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>producto</th>\n",
+       "      <th>vendedor</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">a</th>\n",
+       "      <th>Celia</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>3.503198</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Juan</th>\n",
+       "      <td>-10.989500</td>\n",
+       "      <td>1.082561</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">b</th>\n",
+       "      <th>Celia</th>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>2.179792</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Juan</th>\n",
+       "      <td>-10.223210</td>\n",
+       "      <td>1.875094</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                     balance    income\n",
+       "producto vendedor                     \n",
+       "a        Celia     -2.123048  3.503198\n",
+       "         Juan     -10.989500  1.082561\n",
+       "b        Celia     -0.808254  2.179792\n",
+       "         Juan     -10.223210  1.875094"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.groupby(['producto', 'vendedor']).mean()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Se pueden hacer varias operaciones a la vez con el grupo"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr:last-of-type th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th colspan=\"2\" halign=\"left\">balance</th>\n",
+       "      <th colspan=\"2\" halign=\"left\">income</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th>mean</th>\n",
+       "      <th>count</th>\n",
+       "      <th>mean</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>producto</th>\n",
+       "      <th>vendedor</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">a</th>\n",
+       "      <th>Celia</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>1</td>\n",
+       "      <td>3.503198</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Juan</th>\n",
+       "      <td>-10.989500</td>\n",
+       "      <td>2</td>\n",
+       "      <td>1.082561</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">b</th>\n",
+       "      <th>Celia</th>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2.179792</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Juan</th>\n",
+       "      <td>-10.223210</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1.875094</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                     balance          income      \n",
+       "                        mean count      mean count\n",
+       "producto vendedor                                 \n",
+       "a        Celia     -2.123048     1  3.503198     1\n",
+       "         Juan     -10.989500     2  1.082561     2\n",
+       "b        Celia     -0.808254     1  2.179792     1\n",
+       "         Juan     -10.223210     1  1.875094     1"
+      ]
+     },
+     "execution_count": 19,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.groupby(['producto', 'vendedor']).agg(['mean', 'count'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def strseries(serie):\n",
+    "    return serie.str.len().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>producto</th>\n",
+       "      <th>vendedor</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>a</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>a</td>\n",
+       "      <td>Celia</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>b</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>b</td>\n",
+       "      <td>Celia</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>a</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  producto vendedor\n",
+       "0        a     Juan\n",
+       "1        a    Celia\n",
+       "2        b     Juan\n",
+       "3        b    Celia\n",
+       "4        a     Juan"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.groupby('producto')['producto','vendedor'].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "producto\n",
+       "a    13\n",
+       "b     9\n",
+       "Name: vendedor, dtype: int64"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.groupby('producto')['vendedor'].agg(strseries)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_Nota:_ esto hace ds grupos, uno para el producto a , de tres filas y otro para el b, de 2. De esos grupos sacamos el vendedor, que será, respectivamente, una seria de 3 y 2 vendedores. Y de ahí las agrego usando la función strseries que suma el número de letras de la serie."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Iterando sobre grupos"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Me hago una función para imprimir grupos"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def print_groups(groups):\n",
+    "    for key,group in groups:\n",
+    "        print(f\"Clave '{key}' \")\n",
+    "        print(group)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Clave 'a' \n",
+      "     balance    income producto vendedor\n",
+      "0 -17.575465  1.020607        a     Juan\n",
+      "1  -2.123048  3.503198        a    Celia\n",
+      "4  -4.403535  1.144516        a     Juan\n",
+      "Clave 'b' \n",
+      "     balance    income producto vendedor\n",
+      "2 -10.223210  1.875094        b     Juan\n",
+      "3  -0.808254  2.179792        b    Celia\n"
+     ]
+    }
+   ],
+   "source": [
+    "print_groups(df.groupby('producto'))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Otra forma de ver grupos o de convertirlo"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[('a',      balance    income producto vendedor\n",
+       "  0 -17.575465  1.020607        a     Juan\n",
+       "  1  -2.123048  3.503198        a    Celia\n",
+       "  4  -4.403535  1.144516        a     Juan),\n",
+       " ('b',      balance    income producto vendedor\n",
+       "  2 -10.223210  1.875094        b     Juan\n",
+       "  3  -0.808254  2.179792        b    Celia)]"
+      ]
+     },
+     "execution_count": 38,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "list(df.groupby('producto'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'a':      balance    income producto vendedor\n",
+       " 0 -17.575465  1.020607        a     Juan\n",
+       " 1  -2.123048  3.503198        a    Celia\n",
+       " 4  -4.403535  1.144516        a     Juan,\n",
+       " 'b':      balance    income producto vendedor\n",
+       " 2 -10.223210  1.875094        b     Juan\n",
+       " 3  -0.808254  2.179792        b    Celia}"
+      ]
+     },
+     "execution_count": 40,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dict(list(df.groupby('producto')))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "type(cuentas['a'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0   -17.575465\n",
+       "1    -2.123048\n",
+       "4    -4.403535\n",
+       "Name: balance, dtype: float64"
+      ]
+     },
+     "execution_count": 41,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cuentas['a']['balance']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##  Data aggregation"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import requests\n",
+    "url = 'https://raw.githubusercontent.com/wesm/pydata-book/1st-edition/ch08/tips.csv'\n",
+    "response = requests.get(url)\n",
+    "\n",
+    "out_file = open('tips.csv','wb')\n",
+    "out_file.write(response.content)\n",
+    "out_file.close()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>total_bill</th>\n",
+       "      <th>tip</th>\n",
+       "      <th>sex</th>\n",
+       "      <th>smoker</th>\n",
+       "      <th>day</th>\n",
+       "      <th>time</th>\n",
+       "      <th>size</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>16.99</td>\n",
+       "      <td>1.01</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>10.34</td>\n",
+       "      <td>1.66</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>21.01</td>\n",
+       "      <td>3.50</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>23.68</td>\n",
+       "      <td>3.31</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>24.59</td>\n",
+       "      <td>3.61</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   total_bill   tip     sex smoker  day    time  size\n",
+       "0       16.99  1.01  Female     No  Sun  Dinner     2\n",
+       "1       10.34  1.66    Male     No  Sun  Dinner     3\n",
+       "2       21.01  3.50    Male     No  Sun  Dinner     3\n",
+       "3       23.68  3.31    Male     No  Sun  Dinner     2\n",
+       "4       24.59  3.61  Female     No  Sun  Dinner     4"
+      ]
+     },
+     "execution_count": 45,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips = pd.read_csv('tips.csv')\n",
+    "tips.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "total_bill    244\n",
+       "tip           244\n",
+       "sex           244\n",
+       "smoker        244\n",
+       "day           244\n",
+       "time          244\n",
+       "size          244\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 46,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips.count()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_Ejercicio_: Obtener el porcentaje de propina y analizarlo según sexo y fumador"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tips['percentage'] = 100 * tips['tip'] / tips['total_bill'] "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>total_bill</th>\n",
+       "      <th>tip</th>\n",
+       "      <th>sex</th>\n",
+       "      <th>smoker</th>\n",
+       "      <th>day</th>\n",
+       "      <th>time</th>\n",
+       "      <th>size</th>\n",
+       "      <th>percentage</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>16.99</td>\n",
+       "      <td>1.01</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>2</td>\n",
+       "      <td>5.944673</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>10.34</td>\n",
+       "      <td>1.66</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>3</td>\n",
+       "      <td>16.054159</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>21.01</td>\n",
+       "      <td>3.50</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>3</td>\n",
+       "      <td>16.658734</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>23.68</td>\n",
+       "      <td>3.31</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>2</td>\n",
+       "      <td>13.978041</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>24.59</td>\n",
+       "      <td>3.61</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>No</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>4</td>\n",
+       "      <td>14.680765</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   total_bill   tip     sex smoker  day    time  size  percentage\n",
+       "0       16.99  1.01  Female     No  Sun  Dinner     2    5.944673\n",
+       "1       10.34  1.66    Male     No  Sun  Dinner     3   16.054159\n",
+       "2       21.01  3.50    Male     No  Sun  Dinner     3   16.658734\n",
+       "3       23.68  3.31    Male     No  Sun  Dinner     2   13.978041\n",
+       "4       24.59  3.61  Female     No  Sun  Dinner     4   14.680765"
+      ]
+     },
+     "execution_count": 48,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>count</th>\n",
+       "      <th>mean</th>\n",
+       "      <th>std</th>\n",
+       "      <th>min</th>\n",
+       "      <th>25%</th>\n",
+       "      <th>50%</th>\n",
+       "      <th>75%</th>\n",
+       "      <th>max</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>sex</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Female</th>\n",
+       "      <td>87.0</td>\n",
+       "      <td>16.649074</td>\n",
+       "      <td>5.363173</td>\n",
+       "      <td>5.643341</td>\n",
+       "      <td>14.041645</td>\n",
+       "      <td>15.558149</td>\n",
+       "      <td>19.426621</td>\n",
+       "      <td>41.666667</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Male</th>\n",
+       "      <td>157.0</td>\n",
+       "      <td>15.765055</td>\n",
+       "      <td>6.477787</td>\n",
+       "      <td>3.563814</td>\n",
+       "      <td>12.138869</td>\n",
+       "      <td>15.349194</td>\n",
+       "      <td>18.623962</td>\n",
+       "      <td>71.034483</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        count       mean       std       min        25%        50%        75%  \\\n",
+       "sex                                                                             \n",
+       "Female   87.0  16.649074  5.363173  5.643341  14.041645  15.558149  19.426621   \n",
+       "Male    157.0  15.765055  6.477787  3.563814  12.138869  15.349194  18.623962   \n",
+       "\n",
+       "              max  \n",
+       "sex                \n",
+       "Female  41.666667  \n",
+       "Male    71.034483  "
+      ]
+     },
+     "execution_count": 53,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips.groupby(['sex'])['percentage'].describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>count</th>\n",
+       "      <th>mean</th>\n",
+       "      <th>std</th>\n",
+       "      <th>min</th>\n",
+       "      <th>25%</th>\n",
+       "      <th>50%</th>\n",
+       "      <th>75%</th>\n",
+       "      <th>max</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>smoker</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>No</th>\n",
+       "      <td>151.0</td>\n",
+       "      <td>15.932846</td>\n",
+       "      <td>3.990977</td>\n",
+       "      <td>5.679667</td>\n",
+       "      <td>13.690561</td>\n",
+       "      <td>15.562472</td>\n",
+       "      <td>18.501403</td>\n",
+       "      <td>29.198966</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Yes</th>\n",
+       "      <td>93.0</td>\n",
+       "      <td>16.319604</td>\n",
+       "      <td>8.511920</td>\n",
+       "      <td>3.563814</td>\n",
+       "      <td>10.677083</td>\n",
+       "      <td>15.384615</td>\n",
+       "      <td>19.505852</td>\n",
+       "      <td>71.034483</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        count       mean       std       min        25%        50%        75%  \\\n",
+       "smoker                                                                          \n",
+       "No      151.0  15.932846  3.990977  5.679667  13.690561  15.562472  18.501403   \n",
+       "Yes      93.0  16.319604  8.511920  3.563814  10.677083  15.384615  19.505852   \n",
+       "\n",
+       "              max  \n",
+       "smoker             \n",
+       "No      29.198966  \n",
+       "Yes     71.034483  "
+      ]
+     },
+     "execution_count": 54,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips.groupby(['smoker'])['percentage'].describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th>count</th>\n",
+       "      <th>mean</th>\n",
+       "      <th>std</th>\n",
+       "      <th>min</th>\n",
+       "      <th>25%</th>\n",
+       "      <th>50%</th>\n",
+       "      <th>75%</th>\n",
+       "      <th>max</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>sex</th>\n",
+       "      <th>smoker</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">Female</th>\n",
+       "      <th>No</th>\n",
+       "      <td>54.0</td>\n",
+       "      <td>15.692097</td>\n",
+       "      <td>3.642118</td>\n",
+       "      <td>5.679667</td>\n",
+       "      <td>13.970835</td>\n",
+       "      <td>14.969118</td>\n",
+       "      <td>18.162966</td>\n",
+       "      <td>25.267250</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Yes</th>\n",
+       "      <td>33.0</td>\n",
+       "      <td>18.215035</td>\n",
+       "      <td>7.159451</td>\n",
+       "      <td>5.643341</td>\n",
+       "      <td>15.243902</td>\n",
+       "      <td>17.391304</td>\n",
+       "      <td>19.821606</td>\n",
+       "      <td>41.666667</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">Male</th>\n",
+       "      <th>No</th>\n",
+       "      <td>97.0</td>\n",
+       "      <td>16.066872</td>\n",
+       "      <td>4.184875</td>\n",
+       "      <td>7.180385</td>\n",
+       "      <td>13.181019</td>\n",
+       "      <td>15.760441</td>\n",
+       "      <td>18.621974</td>\n",
+       "      <td>29.198966</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Yes</th>\n",
+       "      <td>60.0</td>\n",
+       "      <td>15.277118</td>\n",
+       "      <td>9.058794</td>\n",
+       "      <td>3.563814</td>\n",
+       "      <td>10.184496</td>\n",
+       "      <td>14.101483</td>\n",
+       "      <td>19.169707</td>\n",
+       "      <td>71.034483</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "               count       mean       std       min        25%        50%  \\\n",
+       "sex    smoker                                                               \n",
+       "Female No       54.0  15.692097  3.642118  5.679667  13.970835  14.969118   \n",
+       "       Yes      33.0  18.215035  7.159451  5.643341  15.243902  17.391304   \n",
+       "Male   No       97.0  16.066872  4.184875  7.180385  13.181019  15.760441   \n",
+       "       Yes      60.0  15.277118  9.058794  3.563814  10.184496  14.101483   \n",
+       "\n",
+       "                     75%        max  \n",
+       "sex    smoker                        \n",
+       "Female No      18.162966  25.267250  \n",
+       "       Yes     19.821606  41.666667  \n",
+       "Male   No      18.621974  29.198966  \n",
+       "       Yes     19.169707  71.034483  "
+      ]
+     },
+     "execution_count": 52,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips.groupby(['sex', 'smoker'])['percentage'].describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 55,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>count</th>\n",
+       "      <th>mean</th>\n",
+       "      <th>std</th>\n",
+       "      <th>min</th>\n",
+       "      <th>25%</th>\n",
+       "      <th>50%</th>\n",
+       "      <th>75%</th>\n",
+       "      <th>max</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>size</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>4.0</td>\n",
+       "      <td>21.729202</td>\n",
+       "      <td>8.034186</td>\n",
+       "      <td>13.793103</td>\n",
+       "      <td>17.077869</td>\n",
+       "      <td>20.275206</td>\n",
+       "      <td>24.926539</td>\n",
+       "      <td>32.573290</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>156.0</td>\n",
+       "      <td>16.571919</td>\n",
+       "      <td>6.684824</td>\n",
+       "      <td>3.563814</td>\n",
+       "      <td>13.522313</td>\n",
+       "      <td>15.610418</td>\n",
+       "      <td>19.503614</td>\n",
+       "      <td>71.034483</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>38.0</td>\n",
+       "      <td>15.215685</td>\n",
+       "      <td>4.545887</td>\n",
+       "      <td>5.643341</td>\n",
+       "      <td>12.475755</td>\n",
+       "      <td>15.932311</td>\n",
+       "      <td>18.613473</td>\n",
+       "      <td>23.074192</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>37.0</td>\n",
+       "      <td>14.594901</td>\n",
+       "      <td>4.239533</td>\n",
+       "      <td>7.745933</td>\n",
+       "      <td>11.774956</td>\n",
+       "      <td>14.669927</td>\n",
+       "      <td>16.979656</td>\n",
+       "      <td>28.053517</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>5.0</td>\n",
+       "      <td>14.149549</td>\n",
+       "      <td>6.773266</td>\n",
+       "      <td>6.565988</td>\n",
+       "      <td>10.657194</td>\n",
+       "      <td>12.138869</td>\n",
+       "      <td>17.219430</td>\n",
+       "      <td>24.166264</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>4.0</td>\n",
+       "      <td>15.622920</td>\n",
+       "      <td>4.215338</td>\n",
+       "      <td>10.379905</td>\n",
+       "      <td>13.165446</td>\n",
+       "      <td>16.289124</td>\n",
+       "      <td>18.746598</td>\n",
+       "      <td>19.533528</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      count       mean       std        min        25%        50%        75%  \\\n",
+       "size                                                                           \n",
+       "1       4.0  21.729202  8.034186  13.793103  17.077869  20.275206  24.926539   \n",
+       "2     156.0  16.571919  6.684824   3.563814  13.522313  15.610418  19.503614   \n",
+       "3      38.0  15.215685  4.545887   5.643341  12.475755  15.932311  18.613473   \n",
+       "4      37.0  14.594901  4.239533   7.745933  11.774956  14.669927  16.979656   \n",
+       "5       5.0  14.149549  6.773266   6.565988  10.657194  12.138869  17.219430   \n",
+       "6       4.0  15.622920  4.215338  10.379905  13.165446  16.289124  18.746598   \n",
+       "\n",
+       "            max  \n",
+       "size             \n",
+       "1     32.573290  \n",
+       "2     71.034483  \n",
+       "3     23.074192  \n",
+       "4     28.053517  \n",
+       "5     24.166264  \n",
+       "6     19.533528  "
+      ]
+     },
+     "execution_count": 55,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips.groupby(['size'])['percentage'].describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Para analizar, hay que tener en cuenta:\n",
+    "- si cada grupo es suficientemente grande. \n",
+    "- ver si la diferencia en media entre grupos es signifitcatida, teniendo en cuenta también la desviación media, que en el fondo es el error"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Creo funciones de agregración:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Diferencia entre máximo y mínimo:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def peak_to_peak(serie):\n",
+    "    return serie.max() - serie.min()\n",
+    "\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Rango normal del 95% (4 veces la desviación estandar)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def rango_normal(serie):\n",
+    "    return 4*serie.std()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Se pueden usar nuestras propieads funciones. Tambíén se pueden renombrar columnas"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th>media</th>\n",
+       "      <th>desv. std.</th>\n",
+       "      <th>count</th>\n",
+       "      <th>rango</th>\n",
+       "      <th>rango 95%</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>sex</th>\n",
+       "      <th>smoker</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">Female</th>\n",
+       "      <th>No</th>\n",
+       "      <td>15.692097</td>\n",
+       "      <td>3.642118</td>\n",
+       "      <td>54</td>\n",
+       "      <td>19.587583</td>\n",
+       "      <td>14.568474</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Yes</th>\n",
+       "      <td>18.215035</td>\n",
+       "      <td>7.159451</td>\n",
+       "      <td>33</td>\n",
+       "      <td>36.023326</td>\n",
+       "      <td>28.637805</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">Male</th>\n",
+       "      <th>No</th>\n",
+       "      <td>16.066872</td>\n",
+       "      <td>4.184875</td>\n",
+       "      <td>97</td>\n",
+       "      <td>22.018581</td>\n",
+       "      <td>16.739501</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Yes</th>\n",
+       "      <td>15.277118</td>\n",
+       "      <td>9.058794</td>\n",
+       "      <td>60</td>\n",
+       "      <td>67.470669</td>\n",
+       "      <td>36.235176</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                   media  desv. std.  count      rango  rango 95%\n",
+       "sex    smoker                                                    \n",
+       "Female No      15.692097    3.642118     54  19.587583  14.568474\n",
+       "       Yes     18.215035    7.159451     33  36.023326  28.637805\n",
+       "Male   No      16.066872    4.184875     97  22.018581  16.739501\n",
+       "       Yes     15.277118    9.058794     60  67.470669  36.235176"
+      ]
+     },
+     "execution_count": 69,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips.groupby(['sex', 'smoker'])['percentage'].agg([('media','mean'),('desv. std.','std'), 'count', ('rango', peak_to_peak), ('rango 95%', rango_normal) ])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_Ejercicio_: hemos visto que la gente es muy extremista. Vamos a analizar esos extremos. Extraer los casos que tengan una propina superior al 40%"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>total_bill</th>\n",
+       "      <th>tip</th>\n",
+       "      <th>sex</th>\n",
+       "      <th>smoker</th>\n",
+       "      <th>day</th>\n",
+       "      <th>time</th>\n",
+       "      <th>size</th>\n",
+       "      <th>percentage</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>172</th>\n",
+       "      <td>7.25</td>\n",
+       "      <td>5.15</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>Yes</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>2</td>\n",
+       "      <td>71.034483</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>178</th>\n",
+       "      <td>9.60</td>\n",
+       "      <td>4.00</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>Yes</td>\n",
+       "      <td>Sun</td>\n",
+       "      <td>Dinner</td>\n",
+       "      <td>2</td>\n",
+       "      <td>41.666667</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     total_bill   tip     sex smoker  day    time  size  percentage\n",
+       "172        7.25  5.15    Male    Yes  Sun  Dinner     2   71.034483\n",
+       "178        9.60  4.00  Female    Yes  Sun  Dinner     2   41.666667"
+      ]
+     },
+     "execution_count": 71,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tips[tips['percentage'] > 40]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Un domingo, una cena, en pareja... ejem"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Unstack\n",
+    "\n",
+    "Sirve para cambiar la forma de _ordenar_ la información agrupada. Pasarla de las columnas a las filas. Es decir, para crear subcabeceras a partir de subcolumnas \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "stacked = df.groupby(['producto', 'vendedor']).mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 75,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th>balance</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>producto</th>\n",
+       "      <th>vendedor</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">a</th>\n",
+       "      <th>Celia</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>3.503198</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Juan</th>\n",
+       "      <td>-10.989500</td>\n",
+       "      <td>1.082561</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th rowspan=\"2\" valign=\"top\">b</th>\n",
+       "      <th>Celia</th>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>2.179792</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Juan</th>\n",
+       "      <td>-10.223210</td>\n",
+       "      <td>1.875094</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                     balance    income\n",
+       "producto vendedor                     \n",
+       "a        Celia     -2.123048  3.503198\n",
+       "         Juan     -10.989500  1.082561\n",
+       "b        Celia     -0.808254  2.179792\n",
+       "         Juan     -10.223210  1.875094"
+      ]
+     },
+     "execution_count": 75,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "stacked"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 79,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr:last-of-type th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr>\n",
+       "      <th></th>\n",
+       "      <th colspan=\"2\" halign=\"left\">balance</th>\n",
+       "      <th colspan=\"2\" halign=\"left\">income</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>vendedor</th>\n",
+       "      <th>Celia</th>\n",
+       "      <th>Juan</th>\n",
+       "      <th>Celia</th>\n",
+       "      <th>Juan</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>producto</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>a</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>-10.98950</td>\n",
+       "      <td>3.503198</td>\n",
+       "      <td>1.082561</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b</th>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>-10.22321</td>\n",
+       "      <td>2.179792</td>\n",
+       "      <td>1.875094</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "           balance              income          \n",
+       "vendedor     Celia      Juan     Celia      Juan\n",
+       "producto                                        \n",
+       "a        -2.123048 -10.98950  3.503198  1.082561\n",
+       "b        -0.808254 -10.22321  2.179792  1.875094"
+      ]
+     },
+     "execution_count": 79,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "stacked.unstack('vendedor')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_Nota_: Es solo otra forma de presentar los datos: llevamos vendedor de las filas a las columnas"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 80,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "MultiIndex(levels=[['balance', 'income'], ['Celia', 'Juan']],\n",
+       "           labels=[[0, 0, 1, 1], [0, 1, 0, 1]],\n",
+       "           names=[None, 'vendedor'])"
+      ]
+     },
+     "execution_count": 80,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "stacked.unstack('vendedor').columns"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_Nota:_ esto nos da información sobre las columnas y sus etiquetas "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Podemos hacer unstack de varias columnas, lo que pasa es que _balance_ ya era una columna"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 83,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr:last-of-type th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr>\n",
+       "      <th></th>\n",
+       "      <th colspan=\"2\" halign=\"left\">balance</th>\n",
+       "      <th colspan=\"2\" halign=\"left\">income</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>vendedor</th>\n",
+       "      <th>Celia</th>\n",
+       "      <th>Juan</th>\n",
+       "      <th>Celia</th>\n",
+       "      <th>Juan</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>producto</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>a</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>-10.98950</td>\n",
+       "      <td>3.503198</td>\n",
+       "      <td>1.082561</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b</th>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>-10.22321</td>\n",
+       "      <td>2.179792</td>\n",
+       "      <td>1.875094</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "           balance              income          \n",
+       "vendedor     Celia      Juan     Celia      Juan\n",
+       "producto                                        \n",
+       "a        -2.123048 -10.98950  3.503198  1.082561\n",
+       "b        -0.808254 -10.22321  2.179792  1.875094"
+      ]
+     },
+     "execution_count": 83,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "stacked.unstack('vendedor', 'balance')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Ahora lo vamos a hacer para el vendedor Celia, y tenemos que hacer la media por cada producto vendido"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 90,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>balance</th>\n",
+       "      <th>income</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>producto</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>a</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>3.503198</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>b</th>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>2.179792</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "           balance    income\n",
+       "producto                    \n",
+       "a        -2.123048  3.503198\n",
+       "b        -0.808254  2.179792"
+      ]
+     },
+     "execution_count": 90,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df[df['vendedor'] == \"Celia\"].groupby('producto').mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 91,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "         producto\n",
+       "balance  a          -2.123048\n",
+       "         b          -0.808254\n",
+       "income   a           3.503198\n",
+       "         b           2.179792\n",
+       "dtype: float64"
+      ]
+     },
+     "execution_count": 91,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df[df['vendedor'] == \"Celia\"].groupby('producto').mean().unstack('producto')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Se convierte en una especia de serie"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "###  Pivot"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Para crear subcabeceras a partir de una cabecera"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 94,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>balance</th>\n",
+       "      <th>income</th>\n",
+       "      <th>producto</th>\n",
+       "      <th>vendedor</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>-17.575465</td>\n",
+       "      <td>1.020607</td>\n",
+       "      <td>a</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>3.503198</td>\n",
+       "      <td>a</td>\n",
+       "      <td>Celia</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>-10.223210</td>\n",
+       "      <td>1.875094</td>\n",
+       "      <td>b</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>2.179792</td>\n",
+       "      <td>b</td>\n",
+       "      <td>Celia</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>-4.403535</td>\n",
+       "      <td>1.144516</td>\n",
+       "      <td>a</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     balance    income producto vendedor\n",
+       "0 -17.575465  1.020607        a     Juan\n",
+       "1  -2.123048  3.503198        a    Celia\n",
+       "2 -10.223210  1.875094        b     Juan\n",
+       "3  -0.808254  2.179792        b    Celia\n",
+       "4  -4.403535  1.144516        a     Juan"
+      ]
+     },
+     "execution_count": 94,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 93,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr>\n",
+       "      <th></th>\n",
+       "      <th colspan=\"2\" halign=\"left\">balance</th>\n",
+       "      <th colspan=\"2\" halign=\"left\">income</th>\n",
+       "      <th colspan=\"2\" halign=\"left\">vendedor</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>producto</th>\n",
+       "      <th>a</th>\n",
+       "      <th>b</th>\n",
+       "      <th>a</th>\n",
+       "      <th>b</th>\n",
+       "      <th>a</th>\n",
+       "      <th>b</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>-17.575465</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>1.020607</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>Juan</td>\n",
+       "      <td>None</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>-2.123048</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>3.503198</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>Celia</td>\n",
+       "      <td>None</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>NaN</td>\n",
+       "      <td>-10.223210</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>1.875094</td>\n",
+       "      <td>None</td>\n",
+       "      <td>Juan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>NaN</td>\n",
+       "      <td>-0.808254</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>2.179792</td>\n",
+       "      <td>None</td>\n",
+       "      <td>Celia</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>-4.403535</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>1.144516</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>Juan</td>\n",
+       "      <td>None</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            balance               income           vendedor       \n",
+       "producto          a          b         a         b        a      b\n",
+       "0        -17.575465        NaN  1.020607       NaN     Juan   None\n",
+       "1         -2.123048        NaN  3.503198       NaN    Celia   None\n",
+       "2               NaN -10.223210       NaN  1.875094     None   Juan\n",
+       "3               NaN  -0.808254       NaN  2.179792     None  Celia\n",
+       "4         -4.403535        NaN  1.144516       NaN     Juan   None"
+      ]
+     },
+     "execution_count": 93,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.pivot(columns='producto')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Example: filling missin values with group-specific values"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 95,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "states = ['Ohio', 'New York', 'Vermont', 'Florida', 'Oregon', 'Nevada', 'California', 'Idaho']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_us = pd.DataFrame(\n",
+    "{\n",
+    "    'states':states,\n",
+    "        'market': ['East'] * 4 + ['West'] * 4,\n",
+    "       'data': [100,82,83,np.nan,20,30,np.nan,np.nan],\n",
+    "})"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 98,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>data</th>\n",
+       "      <th>market</th>\n",
+       "      <th>states</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>100.0</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Ohio</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>82.0</td>\n",
+       "      <td>East</td>\n",
+       "      <td>New York</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>83.0</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Vermont</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>NaN</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Florida</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>20.0</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Oregon</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>30.0</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Nevada</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>NaN</td>\n",
+       "      <td>West</td>\n",
+       "      <td>California</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>NaN</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Idaho</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    data market      states\n",
+       "0  100.0   East        Ohio\n",
+       "1   82.0   East    New York\n",
+       "2   83.0   East     Vermont\n",
+       "3    NaN   East     Florida\n",
+       "4   20.0   West      Oregon\n",
+       "5   30.0   West      Nevada\n",
+       "6    NaN   West  California\n",
+       "7    NaN   West       Idaho"
+      ]
+     },
+     "execution_count": 98,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_us"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Rellenamos los datos vacíos de data con la media de data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 102,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Clave 'East' \n",
+      "0    100.0\n",
+      "1     82.0\n",
+      "2     83.0\n",
+      "3      NaN\n",
+      "Name: data, dtype: float64\n",
+      "Clave 'West' \n",
+      "4    20.0\n",
+      "5    30.0\n",
+      "6     NaN\n",
+      "7     NaN\n",
+      "Name: data, dtype: float64\n"
+     ]
+    }
+   ],
+   "source": [
+    "print_groups(df_us.groupby('market')['data'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 100,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0    100.000000\n",
+       "1     82.000000\n",
+       "2     83.000000\n",
+       "3     88.333333\n",
+       "4     20.000000\n",
+       "5     30.000000\n",
+       "6     25.000000\n",
+       "7     25.000000\n",
+       "Name: data, dtype: float64"
+      ]
+     },
+     "execution_count": 100,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_us.groupby('market')['data'].apply(lambda serie_de_data: serie_de_data.fillna(serie_de_data.mean()))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Me liaba porque en el fonde esto no es una serie, sino la dataframe esta especial del group by. Este función lo apica a todas los valores de todos los grupo s y te lo da en una serie plana: Ver: https://pandas.pydata.org/pandas-docs/stable/generated/pandas.core.groupby.GroupBy.apply.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 105,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_us2 = df_us.copy()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 106,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_us2['data'] = df_us2.groupby('market')['data'].apply(lambda serie_de_data: serie_de_data.fillna(serie_de_data.mean()))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 107,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>data</th>\n",
+       "      <th>market</th>\n",
+       "      <th>states</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>100.000000</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Ohio</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>82.000000</td>\n",
+       "      <td>East</td>\n",
+       "      <td>New York</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>83.000000</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Vermont</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>88.333333</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Florida</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>20.000000</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Oregon</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>30.000000</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Nevada</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>25.000000</td>\n",
+       "      <td>West</td>\n",
+       "      <td>California</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>25.000000</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Idaho</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         data market      states\n",
+       "0  100.000000   East        Ohio\n",
+       "1   82.000000   East    New York\n",
+       "2   83.000000   East     Vermont\n",
+       "3   88.333333   East     Florida\n",
+       "4   20.000000   West      Oregon\n",
+       "5   30.000000   West      Nevada\n",
+       "6   25.000000   West  California\n",
+       "7   25.000000   West       Idaho"
+      ]
+     },
+     "execution_count": 107,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_us2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Ahora lo vamos a intentar llenar con un diccionario"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 110,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fill_values = { 'East': 10, 'West': 200}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 109,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fill_func = lambda group : group.fillna(fill_values[group.name])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 111,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>data</th>\n",
+       "      <th>market</th>\n",
+       "      <th>states</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>100.0</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Ohio</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>82.0</td>\n",
+       "      <td>East</td>\n",
+       "      <td>New York</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>83.0</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Vermont</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>10.0</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Florida</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>20.0</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Oregon</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>30.0</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Nevada</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>200.0</td>\n",
+       "      <td>West</td>\n",
+       "      <td>California</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>200.0</td>\n",
+       "      <td>West</td>\n",
+       "      <td>Idaho</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    data market      states\n",
+       "0  100.0   East        Ohio\n",
+       "1   82.0   East    New York\n",
+       "2   83.0   East     Vermont\n",
+       "3   10.0   East     Florida\n",
+       "4   20.0   West      Oregon\n",
+       "5   30.0   West      Nevada\n",
+       "6  200.0   West  California\n",
+       "7  200.0   West       Idaho"
+      ]
+     },
+     "execution_count": 111,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_us.groupby('market').apply(fill_func)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
